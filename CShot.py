@@ -2,7 +2,7 @@ import mysql.connector
 
 
 class SaveData():
-    def __init__(self, host = "127.0.0.1", user = "root", password = 123456789, database = "Project_Ap"):
+    def __init__(self, host = "localhost", user = "root", password = "123456789", database = "`rank_player_cshot"):
         self.host = host 
         self.user = user
         self.password = password
@@ -39,6 +39,6 @@ if __name__ == "__main__":
     db.connectToDatabase()
     db.Table()
     db.Register("Ali", 25)
-    # db.close_connection()
+
 
     
