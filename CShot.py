@@ -7,9 +7,6 @@ class SaveData():
         self.user = user
         self.password = password
         self.database = database
-        self.conn = None
-        self.cursor = None
-    def connectToDatabase(self):
         self.conn = mysql.connector.connect(
             host = self.host,
             user = self.user,
@@ -17,31 +14,42 @@ class SaveData():
             database=self.database
         )
         self.cursor = self.conn.cursor()
-        print("3*9")
-    def Table(self):
+    def Table(self):                      #ساخت جدول برای ثبت اطلاعات
         self.cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE IF NOT EXISTS leaderboard (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
+        name VARCHAR(50) NOT NULL,
         point BIGINT
     )
     ''')
-    def Register(self, name, point=0):
+    def Register(self, name, point=0):     #ثبت کردن اطلاعات بازیکن
         self.cursor.execute('''
-            INSERT INTO users (name, point)
+            INSERT INTO leaderboard (name, point)
             VALUES (%s, %s)
         ''', (name, point))
         self.conn.commit()
-
+    def repeatName(self, name, point):    #اگر اسم تکراری باشد امتیاز گرفته شده را اضافه میکند به امتیاز قبلی
+        self.cursor.execute('SELECT * FROM leaderboard')
+        users = self.cursor.fetchall()
+        for user in users:
+            if user[1] == name:
+                CurrentScore = user[2]
+                newScore = CurrentScore + point
+                self.cursor.execute('''
+                UPDATE leaderboard
+                SET point = %s
+                WHERE name = %s '''
+                , (newScore, name))
+                self.conn.commit()
 
 
 
 if __name__ == "__main__":
-    db = SaveData()
-    db.connectToDatabase()
-    db.Table()
-    db.Register("amin","66")
-    print(True)
+    P1 = SaveData()
+    P1.Table()
+    P1.Register("saeed",36)
+    P1.repeatName("saeed",100)
+    
 
 
     
