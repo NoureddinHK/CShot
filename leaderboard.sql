@@ -1,0 +1,1 @@
+	SELECT * FROM rank_player_cshot.leaderboard;

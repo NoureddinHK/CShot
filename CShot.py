@@ -41,14 +41,22 @@ class SaveData():
                 WHERE name = %s '''
                 , (newScore, name))
                 self.conn.commit()
+                return
+        self.Register(name, point)
+    def sortAndPrint(self):
+        self.cursor.execute("SELECT * FROM leaderboard ORDER BY point DESC")
+        sortPoint = self.cursor.fetchall()
+        for player in sortPoint:
+            print(f"rank: {sortPoint.index(player)+1} name: {player[1]} point: {player[2]}")
 
 
 
 if __name__ == "__main__":
     P1 = SaveData()
-    P1.Table()
-    P1.Register("saeed",36)
-    P1.repeatName("saeed",100)
+    # P1.Table()
+    # P1.Register("shahin",1200)
+    P1.sortAndPrint()
+    
     
 
 
