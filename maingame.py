@@ -27,6 +27,9 @@ large_font = pygame.font.Font(None, 72)  # Bigger font for Game Over screen
 target_image = pygame.image.load("target.png")
 target_image = pygame.transform.scale(target_image, (40, 40))
 
+# Timer settings (seconds)
+TIMER_DURATION = 60  # Each player gets 60 seconds
+
 
 class Player:
     def __init__(self, color, controls, name):
@@ -136,12 +139,23 @@ while True:  # Restart game loop
     ]
 
     traces = []
-    targets = [Target() for _ in range(8)] # number of targets spawning
+    targets = [Target() for _ in range(8)]  # number of targets spawning
+
+    # Timers for each player
+    player_timers = [TIMER_DURATION, TIMER_DURATION]
+    clock = pygame.time.Clock()
 
     running = True
     while running:
         screen.fill(WHITE)
         pygame.draw.rect(screen, BLACK, PLAY_AREA, 3)
+
+        dt = clock.tick(30) / 1000  # Delta time in seconds
+        for i in range(2):
+            if player_timers[i] > 0:
+                player_timers[i] -= dt
+            else:
+                player_timers[i] = 0  # Prevent negative timer
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -152,8 +166,8 @@ while True:  # Restart game loop
                     if event.key == player.controls["shoot"]:
                         player.can_shoot = True
             elif event.type == pygame.KEYDOWN:
-                for player in players:
-                    if event.key == player.controls["shoot"]:
+                for i, player in enumerate(players):
+                    if event.key == player.controls["shoot"] and player_timers[i] > 0:
                         player.shoot(traces)
 
         keys = pygame.key.get_pressed()
@@ -191,21 +205,19 @@ while True:  # Restart game loop
                 new_traces.append(trace)
         traces = new_traces
 
-        name_text1 = font.render(f"{players[0].name}", True, RED)
-        name_text2 = font.render(f"{players[1].name}", True, BLUE)
+        name_text1 = font.render(f"{players[0].name} | Time: {int(player_timers[0])}s", True, RED)
+        name_text2 = font.render(f"{players[1].name} | Time: {int(player_timers[1])}s", True, BLUE)
         bullet_text1 = font.render(f"Bullets: {players[0].bullets} | Score: {players[0].score}", True, RED)
         bullet_text2 = font.render(f"Bullets: {players[1].bullets} | Score: {players[1].score}", True, BLUE)
 
         screen.blit(name_text1, (20, 20))
         screen.blit(bullet_text1, (20, 50))
-        screen.blit(name_text2, (WIDTH - 250, 20))
-        screen.blit(bullet_text2, (WIDTH - 250, 50))
+        screen.blit(name_text2, (WIDTH - 300, 20))
+        screen.blit(bullet_text2, (WIDTH - 300, 50))
 
         pygame.display.flip()
-        pygame.time.delay(30)
 
-        # Check if both players are out of bullets
-        if players[0].bullets == 0 and players[1].bullets == 0:
+        if (players[0].bullets == 0 and players[1].bullets == 0) or (player_timers[0] == 0 and player_timers[1] == 0):
             running = False
 
     game_over_screen()
