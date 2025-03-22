@@ -87,23 +87,30 @@ class Target:
 
 def game_over_screen():
     screen.fill(WHITE)
-    winner = "It's a Tie!"
-    
+
+    # Determine the winner
     if players[0].score > players[1].score:
-        winner = f"{players[0].name} Wins!"
+        winner_text = f"{players[0].name} Wins!"
         winner_color = RED
     elif players[1].score > players[0].score:
-        winner = f"{players[1].name} Wins!"
+        winner_text = f"{players[1].name} Wins!"
         winner_color = BLUE
     else:
+        winner_text = "It's a Tie!"
         winner_color = BLACK
 
+    # Render game over text
     text = large_font.render("Game Over", True, BLACK)
-    winner_text = large_font.render(winner, True, winner_color)
+    winner_display = large_font.render(winner_text, True, winner_color)
+    score_text1 = font.render(f"{players[0].name}: {players[0].score} points", True, RED)
+    score_text2 = font.render(f"{players[1].name}: {players[1].score} points", True, BLUE)
     restart_text = font.render("Press 'R' to Restart or 'ESC' to Exit", True, BLACK)
 
-    screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 3))
-    screen.blit(winner_text, (WIDTH // 2 - winner_text.get_width() // 2, HEIGHT // 2))
+    # Positioning the texts
+    screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 4))
+    screen.blit(winner_display, (WIDTH // 2 - winner_display.get_width() // 2, HEIGHT // 3))
+    screen.blit(score_text1, (WIDTH // 2 - score_text1.get_width() // 2, HEIGHT // 2))
+    screen.blit(score_text2, (WIDTH // 2 - score_text2.get_width() // 2, HEIGHT // 1.8))
     screen.blit(restart_text, (WIDTH // 2 - restart_text.get_width() // 2, HEIGHT // 1.5))
 
     pygame.display.flip()
@@ -124,28 +131,8 @@ def game_over_screen():
 
 while True:  # Restart game loop
     players = [
-        Player(
-            RED,
-            {
-                "up": pygame.K_w,
-                "down": pygame.K_s,
-                "left": pygame.K_a,
-                "right": pygame.K_d,
-                "shoot": pygame.K_f,
-            },
-            "Player 1",
-        ),
-        Player(
-            BLUE,
-            {
-                "up": pygame.K_UP,
-                "down": pygame.K_DOWN,
-                "left": pygame.K_LEFT,
-                "right": pygame.K_RIGHT,
-                "shoot": pygame.K_RETURN,
-            },
-            "Player 2",
-        ),
+        Player(RED, {"up": pygame.K_w, "down": pygame.K_s, "left": pygame.K_a, "right": pygame.K_d, "shoot": pygame.K_f}, "Player 1"),
+        Player(BLUE, {"up": pygame.K_UP, "down": pygame.K_DOWN, "left": pygame.K_LEFT, "right": pygame.K_RIGHT, "shoot": pygame.K_RETURN}, "Player 2"),
     ]
 
     traces = []
@@ -174,7 +161,7 @@ while True:  # Restart game loop
             player.move(keys)
 
         for x, y, color in traces:
-            pygame.draw.circle(screen, color, (x, y), 5)  # color and radius for pointers
+            pygame.draw.circle(screen, color, (x, y), 5)  # color and radius of pointers
 
         for target in targets:
             target.draw(screen)
@@ -217,6 +204,7 @@ while True:  # Restart game loop
         pygame.display.flip()
         pygame.time.delay(30)
 
+        # Check if both players are out of bullets
         if players[0].bullets == 0 and players[1].bullets == 0:
             running = False
 
