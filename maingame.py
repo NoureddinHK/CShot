@@ -23,9 +23,6 @@ PLAY_AREA = pygame.Rect(100, 100, 1000, 500)
 font = pygame.font.Font(None, 36)
 large_font = pygame.font.Font(None, 72)  # Bigger font for Game Over screen
 
-# Load target image
-target_image = pygame.image.load("target.png")
-target_image = pygame.transform.scale(target_image, (40, 40))
 
 # Timer settings (seconds)
 TIMER_DURATION = 60  # Each player gets 60 seconds
@@ -68,6 +65,8 @@ class Target:
             random.randint(PLAY_AREA.left + 20, PLAY_AREA.right - 40),
             random.randint(PLAY_AREA.top + 20, PLAY_AREA.bottom - 40),
         ]
+        target_image = pygame.image.load("target.png")
+        target_image = pygame.transform.scale(target_image, (40, 40))
         self.image = target_image
         self.width, self.height = self.image.get_size()
 
@@ -86,6 +85,26 @@ class Target:
             random.randint(PLAY_AREA.left + 20, PLAY_AREA.right - 40),
             random.randint(PLAY_AREA.top + 20, PLAY_AREA.bottom - 40),
         ]
+
+class BonusTarget(Target):
+    def __init__(self):
+        super().__init__()
+        ammo_image = pygame.image.load("ammo.png")
+        self.image = pygame.transform.scale(ammo_image, (50, 50))  # Larger size for distinction
+
+    def special_effect(self, player):
+        """Define a special effect when hit, e.g., extra points or bullets."""
+        player.score += 100  # Example: Award extra points for hitting a bonus target
+
+class AmmoTarget(Target):
+    def __init__(self):
+        super().__init__()
+        ammo_image = pygame.image.load("ammo.png")
+        self.image = pygame.transform.scale(ammo_image, (55, 45))  # Slightly different size for differentiation
+
+    def grant_ammo(self, player):
+        """Grants extra bullets when hit."""
+        player.bullets += 5  # Example: Reward 5 extra bullets
 
 
 def game_over_screen():
@@ -139,7 +158,7 @@ while True:  # Restart game loop
     ]
 
     traces = []
-    targets = [Target() for _ in range(8)]  # number of targets spawning
+    targets = [Target() for _ in range(5)] + [BonusTarget() for _ in range(2)] + [AmmoTarget() for _ in range(1)]  # Mix of normal and bonus targets # number of targets spawning
 
     # Timers for each player
     player_timers = [TIMER_DURATION, TIMER_DURATION]
@@ -189,20 +208,19 @@ while True:  # Restart game loop
                     break
 
             if hit_target:
-                hit_target.respawn()
                 for player in players:
                     if trace[2] == player.color:
-                        if player.last_hit_position is None:
-                            player.score += 50
+                        if isinstance(hit_target, BonusTarget):
+                            player.score += 100  # Bonus target gives extra points
+                        elif isinstance(hit_target, AmmoTarget):
+                            hit_target.grant_ammo(player)  # Ammo target gives extra bullets
                         else:
-                            distance = math.sqrt(
-                                (player.last_hit_position[0] - hit_target.position[0]) ** 2
-                                + (player.last_hit_position[1] - hit_target.position[1]) ** 2
-                            )
-                            player.score += max(1, int(distance // 10))
-                        player.last_hit_position = hit_target.position
+                            player.score += 50  # Normal target scoring
+
+                hit_target.respawn()  # Respawn the target after being hit
             else:
                 new_traces.append(trace)
+
         traces = new_traces
 
         name_text1 = font.render(f"{players[0].name} | Time: {int(player_timers[0])}s", True, RED)
