@@ -12,6 +12,13 @@ pygame.display.set_caption("Two Pointers Movement and Shooting")
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+BLACK = (0, 0, 0)
+
+# Play area boundaries
+PLAY_AREA = pygame.Rect(100, 100, 1000, 500)  # x, y, width, height
+
+# Initialize font
+font = pygame.font.Font(None, 36)
 
 # Initial positions for pointers
 pointer1 = [200, 300]  # Controlled by WASD
@@ -35,6 +42,7 @@ bullets2 = 30
 running = True
 while running:
     screen.fill(WHITE)  # Clear screen
+    pygame.draw.rect(screen, BLACK, PLAY_AREA, 3)  # Draw play area border
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -58,28 +66,34 @@ while running:
     keys = pygame.key.get_pressed()
     
     # Pointer 1 movement (WASD)
-    if keys[pygame.K_w]:
+    if keys[pygame.K_w] and pointer1[1] - speed > PLAY_AREA.top:
         pointer1[1] -= speed
-    if keys[pygame.K_s]:
+    if keys[pygame.K_s] and pointer1[1] + speed < PLAY_AREA.bottom:
         pointer1[1] += speed
-    if keys[pygame.K_a]:
+    if keys[pygame.K_a] and pointer1[0] - speed > PLAY_AREA.left:
         pointer1[0] -= speed
-    if keys[pygame.K_d]:
+    if keys[pygame.K_d] and pointer1[0] + speed < PLAY_AREA.right:
         pointer1[0] += speed
     
     # Pointer 2 movement (Arrow Keys)
-    if keys[pygame.K_UP]:
+    if keys[pygame.K_UP] and pointer2[1] - speed > PLAY_AREA.top:
         pointer2[1] -= speed
-    if keys[pygame.K_DOWN]:
+    if keys[pygame.K_DOWN] and pointer2[1] + speed < PLAY_AREA.bottom:
         pointer2[1] += speed
-    if keys[pygame.K_LEFT]:
+    if keys[pygame.K_LEFT] and pointer2[0] - speed > PLAY_AREA.left:
         pointer2[0] -= speed
-    if keys[pygame.K_RIGHT]:
+    if keys[pygame.K_RIGHT] and pointer2[0] + speed < PLAY_AREA.right:
         pointer2[0] += speed
     
     # Draw traces
     for x, y, color in traces:
         pygame.draw.circle(screen, color, (x, y), 3)
+    
+    # Display bullet count
+    bullet_text1 = font.render(f"Bullets: {bullets1}", True, RED)
+    bullet_text2 = font.render(f"Bullets: {bullets2}", True, BLUE)
+    screen.blit(bullet_text1, (20, 20))  # Top left corner
+    screen.blit(bullet_text2, (WIDTH - 150, 20))  # Top right corner
     
     # Update display
     pygame.display.flip()
