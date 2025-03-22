@@ -15,7 +15,6 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
-GREEN = (0, 255, 0)
 
 # Play area boundaries
 PLAY_AREA = pygame.Rect(100, 100, 1000, 500)
@@ -23,9 +22,13 @@ PLAY_AREA = pygame.Rect(100, 100, 1000, 500)
 # Initialize font
 font = pygame.font.Font(None, 36)
 
+# Load target image
+target_image = pygame.image.load("target.png")
+target_image = pygame.transform.scale(target_image, (40, 40))
+
 class Player:
-    def __init__(self, x, y, color, controls, name):
-        self.position = [x, y]
+    def __init__(self, color, controls, name):
+        self.position = [random.randint(PLAY_AREA.left + 20, PLAY_AREA.right - 20), random.randint(PLAY_AREA.top + 20, PLAY_AREA.bottom - 20)]
         self.color = color
         self.controls = controls
         self.bullets = 30
@@ -51,12 +54,12 @@ class Player:
             self.bullets -= 1
 
 players = [
-    Player(200, 300, RED, {'up': pygame.K_w, 'down': pygame.K_s, 'left': pygame.K_a, 'right': pygame.K_d, 'shoot': pygame.K_f}, "Player 1"),
-    Player(600, 300, BLUE, {'up': pygame.K_UP, 'down': pygame.K_DOWN, 'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'shoot': pygame.K_RETURN}, "Player 2")
+    Player(RED, {'up': pygame.K_w, 'down': pygame.K_s, 'left': pygame.K_a, 'right': pygame.K_d, 'shoot': pygame.K_f}, "Player 1"),
+    Player(BLUE, {'up': pygame.K_UP, 'down': pygame.K_DOWN, 'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'shoot': pygame.K_RETURN}, "Player 2")
 ]
 
 traces = []
-objects = [(random.randint(120, 1080), random.randint(120, 580)) for _ in range(8)]
+objects = [(random.randint(120, 1080), random.randint(120, 580)) for _ in range(8)]   # x, y for target spawn bounds
 
 running = True
 while running:
@@ -80,10 +83,10 @@ while running:
         player.move(keys)
     
     for x, y, color in traces:
-        pygame.draw.circle(screen, color, (x, y), 3)
+        pygame.draw.circle(screen, color, (x, y), 5)    # color and radius for pointers
     
     for obj in objects:
-        pygame.draw.rect(screen, GREEN, (obj[0], obj[1], 20, 20))
+        screen.blit(target_image, (obj[0], obj[1]))
     
     new_traces = []
     for trace in traces:
@@ -120,5 +123,5 @@ while running:
     
     pygame.display.flip()
     pygame.time.delay(30)
-
+    
 pygame.quit()
