@@ -24,7 +24,7 @@ PLAY_AREA = pygame.Rect(100, 100, 1000, 500)
 font = pygame.font.Font(None, 36)
 
 class Player:
-    def __init__(self, x, y, color, controls):
+    def __init__(self, x, y, color, controls, name):
         self.position = [x, y]
         self.color = color
         self.controls = controls
@@ -32,6 +32,7 @@ class Player:
         self.score = 0
         self.can_shoot = True
         self.last_hit_position = None
+        self.name = name  # Placeholder for future SQL integration
     
     def move(self, keys):
         if keys[self.controls['up']] and self.position[1] - 7 > PLAY_AREA.top:
@@ -50,8 +51,8 @@ class Player:
             self.bullets -= 1
 
 players = [
-    Player(200, 300, RED, {'up': pygame.K_w, 'down': pygame.K_s, 'left': pygame.K_a, 'right': pygame.K_d, 'shoot': pygame.K_f}),
-    Player(600, 300, BLUE, {'up': pygame.K_UP, 'down': pygame.K_DOWN, 'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'shoot': pygame.K_RETURN})
+    Player(200, 300, RED, {'up': pygame.K_w, 'down': pygame.K_s, 'left': pygame.K_a, 'right': pygame.K_d, 'shoot': pygame.K_f}, "Player 1"),
+    Player(600, 300, BLUE, {'up': pygame.K_UP, 'down': pygame.K_DOWN, 'left': pygame.K_LEFT, 'right': pygame.K_RIGHT, 'shoot': pygame.K_RETURN}, "Player 2")
 ]
 
 traces = []
@@ -107,10 +108,15 @@ while running:
             new_traces.append(trace)
     traces = new_traces
     
+    name_text1 = font.render(f"{players[0].name}", True, RED)
+    name_text2 = font.render(f"{players[1].name}", True, BLUE)
     bullet_text1 = font.render(f"Bullets: {players[0].bullets} | Score: {players[0].score}", True, RED)
     bullet_text2 = font.render(f"Bullets: {players[1].bullets} | Score: {players[1].score}", True, BLUE)
-    screen.blit(bullet_text1, (20, 20))
-    screen.blit(bullet_text2, (WIDTH - 250, 20))
+    
+    screen.blit(name_text1, (20, 20))
+    screen.blit(bullet_text1, (20, 50))
+    screen.blit(name_text2, (WIDTH - 250, 20))
+    screen.blit(bullet_text2, (WIDTH - 250, 50))
     
     pygame.display.flip()
     pygame.time.delay(30)
