@@ -236,7 +236,8 @@ while True:  # Restart game loop
 
         pygame.display.flip()
 
-        if (players[0].bullets == 0 and players[1].bullets == 0) or (player_timers[0] == 0 and player_timers[1] == 0):
+        if (players[0].bullets == 0 and players[1].bullets == 0) or (player_timers[0] == 0 and player_timers[1] == 0) or (players[0].bullets == 0 and player_timers[1] == 0) or (players[1].bullets == 0 and player_timers[0] == 0):
             running = False
+
 
     game_over_screen()
