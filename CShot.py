@@ -773,7 +773,7 @@ class LoginMenu(Menu):
     
     def draw_menu(self):
         super().draw_menu()
-        pygame.draw.rect(self.screen, (200, 200, 200), (550, 350, 300, 50), 2)
+        pygame.draw.rect(self.screen, (200, 200, 200), (490, 355, 300, 50), 2)
         text_surface = self.font.render(self.input_text, True, (0, 0, 0))
         self.screen.blit(text_surface, (500, 360))
 
@@ -936,7 +936,7 @@ leaderboard_data = SaveData().sortAndPrint()
 
 # Create menus
 # Create menus
-main_menu = Menu(screen, "Main Menu", ["Register", "Login", "Leaderboard", "Quit"])
+main_menu = Menu(screen, "Main Menu", ["New Game", "Leaderboard", "Quit"])
 register_menu = RegisterMenu(screen, "Register Menu", parent=main_menu)
 login_menu = LoginMenu(screen, "Login Menu", parent=main_menu)
 extra_input_menu = ExtraInputMenu(screen, "Extra Step", parent=main_menu)  # New step
@@ -946,7 +946,7 @@ leaderboard_menu = LeaderboardMenu(screen, "Leaderboard", leaderboard_data, pare
 current_menu = main_menu
 
 menu_history = []
-
+pygame.display.set_caption("CSHOT GAME")
 while current_menu:
     menu_history.append(current_menu)  # Track menu history
     choice = current_menu.run()
@@ -955,7 +955,7 @@ while current_menu:
         current_menu = None  # Exit program
     elif choice == "Register":
         current_menu = register_menu
-    elif choice == "Login":
+    elif choice == "New Game":
         current_menu = login_menu
     elif choice == "Leaderboard":
         current_menu = leaderboard_menu
