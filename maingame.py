@@ -7,7 +7,7 @@ pygame.init()
 # Set up display
 WIDTH, HEIGHT = 1200, 700
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Two Pointers Movement and Shooting")
+pygame.display.set_caption("CShot")
 
 # Define colors
 WHITE = (255, 255, 255)
@@ -126,7 +126,7 @@ class DoublePointsTarget(Target):
     def grant_double_points(self, player):
         """Grants double points effect for the player."""
         player.double_points_active = True
-        player.double_points_timer = 300  # Set the duration for double points (in frames)
+        player.double_points_timer = 360  # Set the duration for double points (in frames)
 
 def game_over_screen():
     screen.fill(WHITE)
@@ -269,6 +269,14 @@ while True:  # Restart game loop
         screen.blit(bullet_text1, (20, 50))
         screen.blit(name_text2, (WIDTH - 300, 20))
         screen.blit(bullet_text2, (WIDTH - 300, 50))
+
+          # Display the double points timers
+        if players[0].double_points_active:
+            dp_timer_text1 = font.render(f"Double Points: {players[0].double_points_timer // 30}s", True, RED)
+            screen.blit(dp_timer_text1, (20, HEIGHT - 40))  # Bottom-left
+        if players[1].double_points_active:
+            dp_timer_text2 = font.render(f"Double Points: {players[1].double_points_timer // 30}s", True, BLUE)
+            screen.blit(dp_timer_text2, (WIDTH - 300, HEIGHT - 40))  # Bottom-right
 
         # Spawn a special item every 15 seconds if none exists
         if pygame.time.get_ticks() - last_special_spawn >= 15000:
