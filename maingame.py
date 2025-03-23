@@ -179,11 +179,14 @@ while True:  # Restart game loop
     ]
 
     traces = []
-    targets = [Target() for _ in range(5)] + [TimerTarget() for _ in range(1)] + [AmmoTarget() for _ in range(1)] + [DoublePointsTarget() for _ in range(1)]  # Add the DoublePointsTarget to the mix
+    targets = [Target() for _ in range(5)]
 
     # Timers for each player
     player_timers = [TIMER_DURATION, TIMER_DURATION]
     clock = pygame.time.Clock()
+
+    last_special_spawn = pygame.time.get_ticks()  # Track last spawn time
+
 
     running = True
     while running:
@@ -243,7 +246,11 @@ while True:  # Restart game loop
                                 points *= 2  # Double the points if active
                             player.score += points  # Add points
 
-                hit_target.respawn()  # Respawn the target after being hit
+                    if isinstance(hit_target, (TimerTarget, AmmoTarget, DoublePointsTarget)):
+                        if hit_target in targets:
+                            targets.remove(hit_target)  # Remove special item when hit
+                    else:
+                        hit_target.respawn()  # Normal target respawns
             else:
                 new_traces.append(trace)
 
@@ -262,6 +269,12 @@ while True:  # Restart game loop
         screen.blit(bullet_text1, (20, 50))
         screen.blit(name_text2, (WIDTH - 300, 20))
         screen.blit(bullet_text2, (WIDTH - 300, 50))
+
+        # Spawn a special item every 15 seconds if none exists
+        if pygame.time.get_ticks() - last_special_spawn >= 15000:
+            special_item = random.choice([TimerTarget(), AmmoTarget(), DoublePointsTarget()])
+            targets.append(special_item)
+            last_special_spawn = pygame.time.get_ticks()  # Reset spawn timer
 
         pygame.display.flip()
 
