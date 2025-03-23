@@ -707,9 +707,7 @@ class SaveData():
     def sortAndPrint(self):
         self.cursor.execute("SELECT * FROM leaderboard ORDER BY point DESC")
         sortPoint = self.cursor.fetchall()
-        return sortPoint
-        # for player in sortPoint:
-        #     print(f"rank: {sortPoint.index(player)+1} name: {player[1]} point: {player[2]}")
+        return sortPoint    
 
 
 
@@ -796,34 +794,6 @@ class LoginMenu(Menu):
                 else:
                     self.input_text += event.unicode
 
-class RegisterMenu(Menu):
-    def __init__(self, screen, title, parent=None):
-        super().__init__(screen, title, ["Submit", "Back"], parent)
-        self.input_text = ""
-    
-    def draw_menu(self):
-        super().draw_menu()
-        pygame.draw.rect(self.screen, (200, 200, 200), (250, 350, 300, 50), 2)
-        text_surface = self.font.render(self.input_text, True, (0, 0, 0))
-        self.screen.blit(text_surface, (260, 360))
-
-    def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    self.selected = (self.selected + 1) % len(self.options)
-                elif event.key == pygame.K_UP:
-                    self.selected = (self.selected - 1) % len(self.options)
-                elif event.key == pygame.K_RETURN:
-                    if self.options[self.selected] == "Submit":
-                        return self.input_text  # Return input value
-                    return self.options[self.selected]
-                elif event.key == pygame.K_BACKSPACE:
-                    self.input_text = self.input_text[:-1]
-                else:
-                    self.input_text += event.unicode
 
 class ExtraInputMenu(Menu):
     def __init__(self, screen, title, parent=None):
@@ -925,19 +895,11 @@ pygame.init()
 screen = pygame.display.set_mode((1200, 700))
 
 #  temporary leaderboard data
-leaderboard_data = [
-    ("Alice", 1500),
-    ("Bob", 1400),
-    ("Charlie", 1300),
-    ("David", 1200),
-    ("Eve", 1100),
-]
 leaderboard_data = SaveData().sortAndPrint()
 
 # Create menus
 # Create menus
 main_menu = Menu(screen, "Main Menu", ["New Game", "Leaderboard", "Quit"])
-register_menu = RegisterMenu(screen, "Register Menu", parent=main_menu)
 login_menu = LoginMenu(screen, "Login Menu", parent=main_menu)
 extra_input_menu = ExtraInputMenu(screen, "Extra Step", parent=main_menu)  # New step
 leaderboard_menu = LeaderboardMenu(screen, "Leaderboard", leaderboard_data, parent=main_menu)
@@ -953,8 +915,6 @@ while current_menu:
 
     if choice == "Quit":
         current_menu = None  # Exit program
-    elif choice == "Register":
-        current_menu = register_menu
     elif choice == "New Game":
         current_menu = login_menu
     elif choice == "Leaderboard":
@@ -973,4 +933,3 @@ while current_menu:
 
 
 pygame.quit()
-
