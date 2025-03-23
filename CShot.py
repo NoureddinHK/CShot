@@ -689,7 +689,7 @@ class SaveData():
             VALUES (%s, %s)
         ''', (name, point))
         self.conn.commit()
-    def repeatName(self, name, point):    #اگر اسم تکراری باشد امتیاز گرفته شده را اضافه میکند به امتیاز قبلی
+    def repeatName(self, name, point=0):    #اگر اسم تکراری باشد امتیاز گرفته شده را اضافه میکند به امتیاز قبلی
         self.cursor.execute('SELECT * FROM leaderboard')
         users = self.cursor.fetchall()
         for user in users:
@@ -707,14 +707,10 @@ class SaveData():
     def sortAndPrint(self):
         self.cursor.execute("SELECT * FROM leaderboard ORDER BY point DESC")
         sortPoint = self.cursor.fetchall()
-        for player in sortPoint:
-            print(f"rank: {sortPoint.index(player)+1} name: {player[1]} point: {player[2]}")
+        return sortPoint
+        # for player in sortPoint:
+        #     print(f"rank: {sortPoint.index(player)+1} name: {player[1]} point: {player[2]}")
 
-if __name__ == "__main__":
-    P1 = SaveData()
-    # P1.Table()
-    # P1.Register("shahin",1200)
-    # P1.sortAndPrint()
 
 
 
@@ -792,6 +788,7 @@ class LoginMenu(Menu):
                     self.selected = (self.selected - 1) % len(self.options)
                 elif event.key == pygame.K_RETURN:
                     if self.options[self.selected] == "Submit":
+                        SaveData().repeatName(str(self.input_text))
                         return self.input_text  # Return input value
                     return self.options[self.selected]
                 elif event.key == pygame.K_BACKSPACE:
@@ -872,7 +869,7 @@ class LeaderboardMenu(Menu):
         self.screen.blit(title_text, title_rect)
 
         # Draw Leaderboard Entries
-        for i, (name, score) in enumerate(self.leaderboard_data):
+        for i, (id,name, score) in enumerate(self.leaderboard_data):
             # Set colors for top 3 players
             if i == 0:
                 color = (255, 215, 0)  # Gold
@@ -935,7 +932,7 @@ leaderboard_data = [
     ("David", 1200),
     ("Eve", 1100),
 ]
-
+leaderboard_data = SaveData().sortAndPrint()
 
 # Create menus
 # Create menus
