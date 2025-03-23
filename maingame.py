@@ -1,6 +1,5 @@
 import pygame
 import random
-import math
 
 # Initialize Pygame
 pygame.init()
@@ -180,7 +179,7 @@ while True:  # Restart game loop
     ]
 
     traces = []
-    targets = [Target() for _ in range(5)] + [TimerTarget() for _ in range(2)] + [AmmoTarget() for _ in range(1)] + [DoublePointsTarget() for _ in range(1)]  # Add the DoublePointsTarget to the mix
+    targets = [Target() for _ in range(5)] + [TimerTarget() for _ in range(1)] + [AmmoTarget() for _ in range(1)] + [DoublePointsTarget() for _ in range(1)]  # Add the DoublePointsTarget to the mix
 
     # Timers for each player
     player_timers = [TIMER_DURATION, TIMER_DURATION]
