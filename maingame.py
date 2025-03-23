@@ -41,6 +41,8 @@ class Player:
         self.can_shoot = True
         self.last_hit_position = None
         self.name = name
+        self.double_points_active = False  # To check if double points are active
+        self.double_points_timer = 0  # Timer for the double points effect
 
     def move(self, keys):
         if keys[self.controls["up"]] and self.position[1] - 7 > PLAY_AREA.top:
@@ -57,6 +59,15 @@ class Player:
             traces.append((self.position[0], self.position[1], self.color))
             self.can_shoot = False
             self.bullets -= 1
+
+    def update(self):
+        """Updates the player's double points timer."""
+        if self.double_points_active:
+            if self.double_points_timer > 0:
+                self.double_points_timer -= 1
+            else:
+                self.double_points_active = False  # Deactivate double points after timer runs out
+                self.double_points_timer = 0
 
 
 class Target:
@@ -107,6 +118,16 @@ class AmmoTarget(Target):
         """Grants extra bullets when hit."""
         player.bullets += 8  # Example: Reward 8 extra bullets
 
+class DoublePointsTarget(Target):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("double_points.png")  # Use a special image for this target
+        self.image = pygame.transform.scale(self.image, (50, 50))  # Set a different size for visibility
+
+    def grant_double_points(self, player):
+        """Grants double points effect for the player."""
+        player.double_points_active = True
+        player.double_points_timer = 300  # Set the duration for double points (in frames)
 
 def game_over_screen():
     screen.fill(WHITE)
@@ -159,7 +180,7 @@ while True:  # Restart game loop
     ]
 
     traces = []
-    targets = [Target() for _ in range(5)] + [TimerTarget() for _ in range(2)] + [AmmoTarget() for _ in range(1)]  # Mix of normal and bonus targets # number of targets spawning
+    targets = [Target() for _ in range(5)] + [TimerTarget() for _ in range(2)] + [AmmoTarget() for _ in range(1)] + [DoublePointsTarget() for _ in range(1)]  # Add the DoublePointsTarget to the mix
 
     # Timers for each player
     player_timers = [TIMER_DURATION, TIMER_DURATION]
@@ -215,14 +236,23 @@ while True:  # Restart game loop
                             hit_target.grant_time(players.index(player))  # Grants extra time to the hitting player
                         elif isinstance(hit_target, AmmoTarget):
                             hit_target.grant_ammo(player)  # Ammo target gives extra bullets
+                        elif isinstance(hit_target, DoublePointsTarget):
+                            hit_target.grant_double_points(player)  # Double points effect
                         else:
-                            player.score += 50  # Normal target scoring
+                            points = 50  # Normal target scoring
+                            if player.double_points_active:
+                                points *= 2  # Double the points if active
+                            player.score += points  # Add points
 
                 hit_target.respawn()  # Respawn the target after being hit
             else:
                 new_traces.append(trace)
 
         traces = new_traces
+
+        # Update players' double points timers
+        for player in players:
+            player.update()
 
         name_text1 = font.render(f"{players[0].name} | Time: {int(player_timers[0])}s", True, RED)
         name_text2 = font.render(f"{players[1].name} | Time: {int(player_timers[1])}s", True, BLUE)
