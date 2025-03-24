@@ -122,6 +122,10 @@ class LoginMenu(Menu):
         text_surface2 = self.font.render(self.input_text2, True, (0, 0, 0))
         self.screen.blit(text_surface, (500, 360))
         self.screen.blit(text_surface2, (500, 455))
+        if LoginMenu.active_input == 1:
+            pygame.draw.rect(self.screen, (0,0,0), (490, 355, 300, 50), 2)
+        else:
+            pygame.draw.rect(self.screen, (0,0,0), (490, 450, 300, 50), 2)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -150,7 +154,6 @@ class LoginMenu(Menu):
                     if event.key == pygame.K_BACKSPACE:
                         self.input_text1 = self.input_text1[:-1]
                     elif event.key == pygame.K_RETURN and self.input_text1 and self.input_text2:
-                        input_list = [self.input_text1, self.input_text2]
                         self.input_text1 = ""
                         self.input_text2 = ""
                     else:
@@ -160,7 +163,6 @@ class LoginMenu(Menu):
                     if event.key == pygame.K_BACKSPACE:
                         self.input_text2 = self.input_text2[:-1]
                     elif event.key == pygame.K_RETURN and self.input_text1 and self.input_text2:
-                        input_list = [self.input_text1, self.input_text2]
                         self.input_text1 = ""
                         self.input_text2 = ""
                     else:
@@ -425,7 +427,8 @@ def game_over_screen():
     screen.blit(score_text2, (WIDTH // 2 - score_text2.get_width() // 2, HEIGHT // 1.8))
     screen.blit(restart_text, (WIDTH // 2 - restart_text.get_width() // 2, HEIGHT // 1.5))
 
-
+    SaveData().repeatName(players[0].name, players[0].score)
+    SaveData().repeatName(players[1].name, players[1].score)
     # برای آپدیت شدن صفحه بازی به صفحه پایان بعد از اتمام بازی
     pygame.display.flip()
 
@@ -472,6 +475,8 @@ while current_menu:
         current_menu = None  # Exit program
     elif choice == "New Game":
         current_menu = login_menu
+        current_menu.run()
+        break
     elif choice == "Leaderboard":
         current_menu = leaderboard_menu
     elif choice == "Back":
