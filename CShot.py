@@ -116,6 +116,10 @@ class LoginMenu(Menu):
     
     def draw_menu(self):
         super().draw_menu()
+        p1 = self.font.render("Player1:", True, (0,0,0))
+        p2 = self.font.render("Player2:", True, (0,0,0))
+        self.screen.blit(p1, (340, 360))
+        self.screen.blit(p2, (340, 455))
         pygame.draw.rect(self.screen, (200, 200, 200), (490, 355, 300, 50), 2)
         pygame.draw.rect(self.screen, (200, 200, 200), (490, 450, 300, 50), 2)
         text_surface = self.font.render(self.input_text1, True, (0, 0, 0))
@@ -475,8 +479,6 @@ while current_menu:
         current_menu = None  # Exit program
     elif choice == "New Game":
         current_menu = login_menu
-        current_menu.run()
-        break
     elif choice == "Leaderboard":
         current_menu = leaderboard_menu
     elif choice == "Back":
