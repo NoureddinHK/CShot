@@ -147,6 +147,8 @@ class LoginMenu(Menu):
                         SaveData().repeatName(str(self.input_text2))
                         namePlayers.append(self.input_text1)
                         namePlayers.append(self.input_text2)
+                        # global current_menu
+                        # current_menu = None
                         return self.input_text1# Return input value
                     return self.options[self.selected]
                 elif event.key == pygame.K_TAB:
@@ -467,6 +469,7 @@ extra_input_menu = ExtraInputMenu(screen, "Extra Step", parent=main_menu)  # New
 leaderboard_menu = LeaderboardMenu(screen, "Leaderboard", leaderboard_data, parent=main_menu)
 
 # Menu navigation
+
 current_menu = main_menu
 
 menu_history = []
@@ -475,15 +478,18 @@ while current_menu:
     menu_history.append(current_menu)  # Track menu history
     choice = current_menu.run()
 
+    if choice == "Back":
+        menu_history.pop()  # Remove the current menu
+        current_menu = menu_history[-1] if menu_history else main_menu  # Go back
+    if current_menu == login_menu:
+        break
     if choice == "Quit":
         current_menu = None  # Exit program
+        exit()
     elif choice == "New Game":
         current_menu = login_menu
     elif choice == "Leaderboard":
         current_menu = leaderboard_menu
-    elif choice == "Back":
-        menu_history.pop()  # Remove the current menu
-        current_menu = menu_history[-1] if menu_history else main_menu  # Go back
     elif isinstance(choice, tuple):  # Username & Password entered
         print(f"Credentials received: {choice}")  
         current_menu = extra_input_menu  # Move to extra input
