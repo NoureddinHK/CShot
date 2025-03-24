@@ -147,8 +147,6 @@ class LoginMenu(Menu):
                         SaveData().repeatName(str(self.input_text2))
                         namePlayers.append(self.input_text1)
                         namePlayers.append(self.input_text2)
-                        # global current_menu
-                        # current_menu = None
                         return self.input_text1# Return input value
                     return self.options[self.selected]
                 elif event.key == pygame.K_TAB:
@@ -209,6 +207,8 @@ class LeaderboardMenu(Menu):
     def __init__(self, screen, title, leaderboard_data, parent=None):
         super().__init__(screen, title, ["Back"], parent)
         self.leaderboard_data = leaderboard_data  # List of (id, name, score) tuples
+        self.scroll_offset = 0  # برای مدیریت اسکرول
+        self.visible_entries = 6  # تعداد بازیکنان قابل نمایش همزمان
 
     def draw_menu(self):
         self.screen.fill((255, 255, 255))
@@ -218,16 +218,22 @@ class LeaderboardMenu(Menu):
         title_rect = title_text.get_rect(center=(600, 50))
         self.screen.blit(title_text, title_rect)
 
-        # Draw Leaderboard Entries
-        for i, (id, name, score) in enumerate(self.leaderboard_data):
-            # Set colors for top 3 players
-            if i == 0:
+        # Draw Leaderboard Entries (only visible ones)
+        for i in range(self.visible_entries):
+            if i + self.scroll_offset >= len(self.leaderboard_data):
+                break
+                
+            id, name, score = self.leaderboard_data[i + self.scroll_offset]
+            
+            # Set colors for top 3 players (global ranking, not visible ones)
+            original_index = i + self.scroll_offset
+            if original_index == 0:
                 color = (255, 215, 0)  # Gold
                 font_size = 60
-            elif i == 1:
+            elif original_index == 1:
                 color = (192, 192, 192)  # Silver
                 font_size = 60
-            elif i == 2:
+            elif original_index == 2:
                 color = (205, 127, 50)  # Bronze
                 font_size = 60
             else:
@@ -242,14 +248,11 @@ class LeaderboardMenu(Menu):
             self.screen.blit(name_text, (350, 150 + i * 50))
             self.screen.blit(score_text, (750, 150 + i * 50))
 
+
         # Draw Back Option
         back_text = self.font.render("Back", True, (255, 0, 0) if self.selected == 0 else (0, 0, 0))
         back_rect = back_text.get_rect(center=(600, 550))
         self.screen.blit(back_text, back_rect)
-        
-        
-
-
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -262,12 +265,17 @@ class LeaderboardMenu(Menu):
                     self.selected = (self.selected - 1) % len(self.options)
                 elif event.key == pygame.K_RETURN:
                     if self.options[self.selected] == "Submit":
-                        return self.input_text  # Return input value
+                        return self.input_text
                     return self.options[self.selected]
                 elif event.key == pygame.K_BACKSPACE:
                     self.input_text = self.input_text[:-1]
                 else:
                     self.input_text += event.unicode
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:  # Scroll up
+                    self.scroll_offset = max(0, self.scroll_offset - 1)
+                elif event.button == 5:  # Scroll down
+                    self.scroll_offset = min(len(self.leaderboard_data) - self.visible_entries, self.scroll_offset + 1)
 
 
 
