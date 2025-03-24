@@ -786,6 +786,7 @@ class LoginMenu(Menu):
                     self.selected = (self.selected - 1) % len(self.options)
                 elif event.key == pygame.K_RETURN:
                     if self.options[self.selected] == "Submit":
+                        SaveData().Table()
                         SaveData().repeatName(str(self.input_text))
                         return self.input_text  # Return input value
                     return self.options[self.selected]
@@ -828,7 +829,7 @@ class ExtraInputMenu(Menu):
 class LeaderboardMenu(Menu):
     def __init__(self, screen, title, leaderboard_data, parent=None):
         super().__init__(screen, title, ["Back"], parent)
-        self.leaderboard_data = leaderboard_data  # List of (name, score) tuples
+        self.leaderboard_data = leaderboard_data  # List of (id, name, score) tuples
 
     def draw_menu(self):
         self.screen.fill((255, 255, 255))
@@ -839,7 +840,7 @@ class LeaderboardMenu(Menu):
         self.screen.blit(title_text, title_rect)
 
         # Draw Leaderboard Entries
-        for i, (id,name, score) in enumerate(self.leaderboard_data):
+        for i, (id, name, score) in enumerate(self.leaderboard_data):
             # Set colors for top 3 players
             if i == 0:
                 color = (255, 215, 0)  # Gold
@@ -895,6 +896,7 @@ pygame.init()
 screen = pygame.display.set_mode((1200, 700))
 
 #  temporary leaderboard data
+SaveData().Table()
 leaderboard_data = SaveData().sortAndPrint()
 
 # Create menus
