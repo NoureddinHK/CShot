@@ -196,7 +196,7 @@ def game_over_screen():
                     exit()
 
 
-while True: # حلقه اصلی بازی
+while True:
     """کلیدهای حرکت پوینتر"""
     players = [
         Player(RED, {"up": pygame.K_w, "down": pygame.K_s, "left": pygame.K_a, "right": pygame.K_d, "shoot": pygame.K_f}, "Player 1"),
@@ -208,43 +208,44 @@ while True: # حلقه اصلی بازی
     targets = [Target() for _ in range(5)] # ایجاد ۵ هدف
 
 
-    player_timers = [TIMER_DURATION, TIMER_DURATION]
-    clock = pygame.time.Clock()
+    player_timers = [TIMER_DURATION, TIMER_DURATION] # TIMER_DURATION = 60
+    clock = pygame.time.Clock() # برای محدودیت fps
 
     last_special_spawn = pygame.time.get_ticks()  # برای مدیریت فاصله زمانی اسپاون شدن آیتم امتیازی
 
 
+    """حلقه اجرای توابع اصلی بازی"""
+
     running = True
     while running:
         screen.fill(WHITE)
-        pygame.draw.rect(screen, BLACK, PLAY_AREA, 3)
+        """ظاهر محدوده بازی"""
+        pygame.draw.rect(screen, BLACK, PLAY_AREA, 3) # مستطیل سیاه با ضخامت ۳
 
-        dt = clock.tick(30) / 1000  # Delta time in seconds
+        dt = clock.tick(30) / 1000  # زمان بین فریم ها برحسب میلی ثانیه
+
+        """مدیریت تایمر بازیکن"""
         for i in range(2):
             if player_timers[i] > 0:
                 player_timers[i] -= dt
             else:
-                player_timers[i] = 0  # Prevent negative timer
+                player_timers[i] = 0  # برای منفی نشدن تایمر
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
-            elif event.type == pygame.KEYUP:
-                for player in players:
-                    if event.key == player.controls["shoot"]:
-                        player.can_shoot = True
+                exit() # خروج از پای گیم و برنامه
             elif event.type == pygame.KEYDOWN:
                 for i, player in enumerate(players):
                     if event.key == player.controls["shoot"] and player_timers[i] > 0:
-                        player.shoot(traces)
+                        player.shoot(traces) # تیراندازی درصورت مثبت بودن تایمر
 
         keys = pygame.key.get_pressed()
         for player in players:
             player.move(keys)
 
         for x, y, color in traces:
-            pygame.draw.circle(screen, color, (x, y), 5)  # color and radius of pointers
+            pygame.draw.circle(screen, color, (x, y), 5)  # ظاهر پوینتر
 
         for target in targets:
             target.draw(screen)
@@ -261,28 +262,30 @@ while True: # حلقه اصلی بازی
                 for player in players:
                     if trace[2] == player.color:
                         if isinstance(hit_target, TimerTarget):
-                            hit_target.grant_time(players.index(player))  # Grants extra time to the hitting player
+                            hit_target.grant_time(players.index(player))
                         elif isinstance(hit_target, AmmoTarget):
-                            hit_target.grant_ammo(player)  # Ammo target gives extra bullets
+                            hit_target.grant_ammo(player)
                         elif isinstance(hit_target, DoublePointsTarget):
-                            hit_target.grant_double_points(player)  # Double points effect
+                            hit_target.grant_double_points(player)
                         else:
                             player.update_score(hit_target)
 
                     if isinstance(hit_target, (TimerTarget, AmmoTarget, DoublePointsTarget)):
                         if hit_target in targets:
-                            targets.remove(hit_target)  # Remove special item when hit
+                            targets.remove(hit_target)
                     else:
-                        hit_target.respawn()  # Normal target respawns
+                        hit_target.respawn()
             else:
                 new_traces.append(trace)
 
         traces = new_traces
 
-        # Update players' double points timers
+        # آپدیت کردن تایمر دابل پوینت
         for player in players:
             player.update()
 
+
+        """نمایش اطلاعات بازیکن"""
         name_text1 = font.render(f"{players[0].name} | Time: {int(player_timers[0])}s", True, RED)
         name_text2 = font.render(f"{players[1].name} | Time: {int(player_timers[1])}s", True, BLUE)
         bullet_text1 = font.render(f"Bullets: {players[0].bullets} | Score: {players[0].score}", True, RED)
@@ -293,24 +296,26 @@ while True: # حلقه اصلی بازی
         screen.blit(name_text2, (WIDTH - 300, 20))
         screen.blit(bullet_text2, (WIDTH - 300, 50))
 
-          # Display the double points timers
+          # نمایش تایمر دابل پوینت و پوزیشن
         if players[0].double_points_active:
             dp_timer_text1 = font.render(f"Double Points: {players[0].double_points_timer // 30}s", True, RED)
-            screen.blit(dp_timer_text1, (20, HEIGHT - 40))  # Bottom-left
+            screen.blit(dp_timer_text1, (20, HEIGHT - 40))  # قرمز
         if players[1].double_points_active:
             dp_timer_text2 = font.render(f"Double Points: {players[1].double_points_timer // 30}s", True, BLUE)
-            screen.blit(dp_timer_text2, (WIDTH - 300, HEIGHT - 40))  # Bottom-right
+            screen.blit(dp_timer_text2, (WIDTH - 300, HEIGHT - 40))  # آبی
 
-        # Spawn a special item every 10 seconds if none exists
+        # هر ۱۰ ثانیه یک آیتم امتیازی اسپاون شود(در لیست تارگت که آیتم های نمایش داده شده بودند اپ اند شود)
         if pygame.time.get_ticks() - last_special_spawn >= 10000:
             special_item = random.choice([TimerTarget(), AmmoTarget(), DoublePointsTarget()])
             targets.append(special_item)
-            last_special_spawn = pygame.time.get_ticks()  # Reset spawn timer
+            last_special_spawn = pygame.time.get_ticks()
 
         pygame.display.flip()
 
+
+        """اگر تیر یا تایم هردوبازیکن تمام شد یا تیر یکی و تایم دیگری تمام شد حلقه بازی تمام شود"""
         if (players[0].bullets == 0 and players[1].bullets == 0) or (player_timers[0] == 0 and player_timers[1] == 0) or (players[0].bullets == 0 and player_timers[1] == 0) or (players[1].bullets == 0 and player_timers[0] == 0):
             running = False
 
 
-    game_over_screen()
+    game_over_screen() # پایان بازی بعد از اتمام حلقه اصلی
