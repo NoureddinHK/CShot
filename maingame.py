@@ -250,7 +250,7 @@ while True:
         for target in targets:
             target.draw(screen)
 
-        new_traces = []
+        new_traces = [] # لیست جدید برای تیرهایی که به هدف نخوردند
         for trace in traces:
             hit_target = None
             for target in targets:
@@ -258,7 +258,7 @@ while True:
                     hit_target = target
                     break
 
-            if hit_target:
+            if hit_target: # اگر تیر به هدف خورد هدف و جای تیر حذف شوند و وضعیت اثرگذاری هدف اینجا بررسی شود
                 for player in players:
                     if trace[2] == player.color:
                         if isinstance(hit_target, TimerTarget):
