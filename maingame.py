@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 # Initialize Pygame
 pygame.init()
@@ -68,6 +69,21 @@ class Player:
                 self.double_points_active = False  # Deactivate double points after timer runs out
                 self.double_points_timer = 0
 
+    def update_score(self, target):
+        current_hit_position = target.position
+        if self.last_hit_position:
+            distance = math.dist(self.last_hit_position, current_hit_position)
+            points = max(int(distance / 5), 10)  # Ensure minimum points (prevents 0-score hits)
+        else:
+            points = 10  # Base score for first hit
+
+        if self.double_points_active:
+            points *= 2  # Apply double points multiplier
+
+        self.score += points
+        print(f"{self.name} scored {points} points (Total: {self.score})")  # Debugging line
+        self.last_hit_position = current_hit_position
+
 
 class Target:
     def __init__(self):
@@ -100,7 +116,7 @@ class TimerTarget(Target):
     def __init__(self):
         super().__init__()
         timer_image = pygame.image.load("timer.png")
-        self.image = pygame.transform.scale(timer_image, (50, 50))  # Larger size for distinction
+        self.image = pygame.transform.scale(timer_image, (55, 55))  # Larger size for distinction
 
     def grant_time(self, player_index):
         """Adds extra time to the respective player's timer."""
@@ -241,10 +257,7 @@ while True:  # Restart game loop
                         elif isinstance(hit_target, DoublePointsTarget):
                             hit_target.grant_double_points(player)  # Double points effect
                         else:
-                            points = 50  # Normal target scoring
-                            if player.double_points_active:
-                                points *= 2  # Double the points if active
-                            player.score += points  # Add points
+                            player.update_score(hit_target)
 
                     if isinstance(hit_target, (TimerTarget, AmmoTarget, DoublePointsTarget)):
                         if hit_target in targets:
@@ -278,8 +291,8 @@ while True:  # Restart game loop
             dp_timer_text2 = font.render(f"Double Points: {players[1].double_points_timer // 30}s", True, BLUE)
             screen.blit(dp_timer_text2, (WIDTH - 300, HEIGHT - 40))  # Bottom-right
 
-        # Spawn a special item every 15 seconds if none exists
-        if pygame.time.get_ticks() - last_special_spawn >= 15000:
+        # Spawn a special item every 10 seconds if none exists
+        if pygame.time.get_ticks() - last_special_spawn >= 10000:
             special_item = random.choice([TimerTarget(), AmmoTarget(), DoublePointsTarget()])
             targets.append(special_item)
             last_special_spawn = pygame.time.get_ticks()  # Reset spawn timer
