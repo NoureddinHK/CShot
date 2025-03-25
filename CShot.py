@@ -1,6 +1,5 @@
 import pygame
 import mysql.connector
-import pygame
 import random
 import math
 
@@ -343,8 +342,8 @@ class Player:
 class Target:
     def __init__(self):
         self.position = [
-            random.randint(PLAY_AREA.left + 10, PLAY_AREA.right - 20), # محدوده تصادفی هدف با فاصله کم از لبه های محدوده بازی
-            random.randint(PLAY_AREA.top + 10, PLAY_AREA.bottom - 20),
+            random.randint(PLAY_AREA.left + 40, PLAY_AREA.right - 40), # محدوده تصادفی هدف با فاصله کم از لبه های محدوده بازی
+            random.randint(PLAY_AREA.top + 20, PLAY_AREA.bottom - 20),
         ]
         target_image = pygame.image.load("target.png") # تصویر هدف
         target_image = pygame.transform.scale(target_image, (45, 45)) # ابعاد هدف
@@ -365,8 +364,8 @@ class Target:
     def respawn(self):
         """اسپاون شدن هدف بعدی"""
         self.position = [
-            random.randint(PLAY_AREA.left + 10, PLAY_AREA.right - 20), # محدوده تصادفی هدف با فاصله کم از لبه های محدوده بازی
-            random.randint(PLAY_AREA.top + 10, PLAY_AREA.bottom - 20),
+            random.randint(PLAY_AREA.left + 40, PLAY_AREA.right - 40), # محدوده تصادفی هدف با فاصله کم از لبه های محدوده بازی
+            random.randint(PLAY_AREA.top + 20, PLAY_AREA.bottom - 20),
         ]
 
 # کلاس هدف امتیازی تایمر 
