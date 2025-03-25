@@ -207,8 +207,8 @@ class LeaderboardMenu(Menu):
     def __init__(self, screen, title, leaderboard_data, parent=None):
         super().__init__(screen, title, ["Back"], parent)
         self.leaderboard_data = leaderboard_data  # List of (id, name, score) tuples
-        self.scroll_offset = 0  # برای مدیریت اسکرول
-        self.visible_entries = 6  # تعداد بازیکنان قابل نمایش همزمان
+        self.scrolly = 0  # مکان اسکرول
+        self.visible_entries = 7  
 
     def draw_menu(self):
         self.screen.fill((255, 255, 255))
@@ -220,13 +220,13 @@ class LeaderboardMenu(Menu):
 
         # Draw Leaderboard Entries (only visible ones)
         for i in range(self.visible_entries):
-            if i + self.scroll_offset >= len(self.leaderboard_data):
+            if i + self.scrolly >= len(self.leaderboard_data):
                 break
                 
-            id, name, score = self.leaderboard_data[i + self.scroll_offset]
+            id, name, score = self.leaderboard_data[i + self.scrolly]
             
             # Set colors for top 3 players (global ranking, not visible ones)
-            original_index = i + self.scroll_offset
+            original_index = i + self.scrolly
             if original_index == 0:
                 color = (255, 215, 0)  # Gold
                 font_size = 60
@@ -273,17 +273,9 @@ class LeaderboardMenu(Menu):
                     self.input_text += event.unicode
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 4:  # Scroll up
-                    self.scroll_offset = max(0, self.scroll_offset - 1)
+                    self.scrolly = max(0, self.scrolly - 1)
                 elif event.button == 5:  # Scroll down
-                    self.scroll_offset = min(len(self.leaderboard_data) - self.visible_entries, self.scroll_offset + 1)
-
-
-
-
-
-
-
-
+                    self.scrolly = min(len(self.leaderboard_data) - self.visible_entries, self.scrolly + 1)
 
 
 
@@ -470,14 +462,12 @@ SaveData().Table()
 leaderboard_data = SaveData().sortAndPrint()
 
 # Create menus
-# Create menus
 main_menu = Menu(screen, "Main Menu", ["New Game", "Leaderboard", "Quit"])
 login_menu = LoginMenu(screen, "Login Menu", parent=main_menu)
 extra_input_menu = ExtraInputMenu(screen, "Extra Step", parent=main_menu)  # New step
 leaderboard_menu = LeaderboardMenu(screen, "Leaderboard", leaderboard_data, parent=main_menu)
 
 # Menu navigation
-
 current_menu = main_menu
 
 menu_history = []
@@ -510,7 +500,7 @@ while current_menu:
 
 pygame.quit()
 
-pygame.init() # اجرای پای گیم
+pygame.init() 
 
 WIDTH, HEIGHT = 1200, 700 # طول و عرض صفحه
 screen = pygame.display.set_mode((WIDTH, HEIGHT)) # نامگذاری بجای استفاده از اعداد
