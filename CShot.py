@@ -5,7 +5,7 @@ import math
 
 namePlayers = []
 class SaveData():
-    def __init__(self, host = "127.0.0.1", user = "root", password = "Hossein251112", database = "rank_player_cshot"):
+    def __init__(self, host = "127.0.0.1", user = "root", password = "123456789", database = "rank_player_cshot"):
         self.host = host 
         self.user = user
         self.password = password
