@@ -5,7 +5,7 @@ import math
 
 namePlayers = []
 class SaveData():
-    def __init__(self, host = "127.0.0.1", user = "root", password = "123456789", database = "rank_player_cshot"):
+    def __init__(self, host = "127.0.0.1", user = "root", password = "Hossein251112", database = "rank_player_cshot"):
         self.host = host 
         self.user = user
         self.password = password
@@ -517,6 +517,28 @@ PLAY_AREA = pygame.Rect(100, 100, 1000, 500)
 font = pygame.font.Font(None, 36) # فونت سایز کوچک
 large_font = pygame.font.Font(None, 72)  # فونت سایز بزرگ
 
+
+"""بخش مربوط به لود کردن ساند افکت"""
+
+pygame.init()
+pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
+
+
+shoot_sound = pygame.mixer.Sound("shoot.mp3") 
+hit_sound = pygame.mixer.Sound("hit.mp3")   
+bonus_sound = pygame.mixer.Sound("bonus.mp3")
+back_ground_sound = pygame.mixer.Sound("back_ground.wav")
+
+shoot_sound.set_volume(0.3) 
+hit_sound.set_volume(1.2)
+bonus_sound.set_volume(0.9)
+
+# Load and play background music (looping)
+pygame.mixer.music.load("back_ground.wav")
+pygame.mixer.music.set_volume(1)  # Adjust volume
+pygame.mixer.music.play(-1)  # Loop forever
+
+
 # تایم هر بازیکن برحسب ثانیه
 TIMER_DURATION = 60
 
@@ -527,7 +549,7 @@ while True:
         Player(BLUE, {"up": pygame.K_UP, "down": pygame.K_DOWN, "left": pygame.K_LEFT, "right": pygame.K_RIGHT, "shoot": pygame.K_RETURN}, namePlayers[1]),
     ]
 
-    # لیست برای ذخیره اثر شلیک ها
+    # (به صورت تاپل)لیست برای ذخیره اثر شلیک ها
     traces = []
     targets = [Target() for _ in range(5)] # ایجاد ۵ هدف
 
@@ -543,6 +565,7 @@ while True:
     running = True
     while running:
         screen.fill(WHITE)
+
         """ظاهر محدوده بازی"""
         pygame.draw.rect(screen, BLACK, PLAY_AREA, 3) # مستطیل سیاه با ضخامت ۳
 
@@ -563,6 +586,7 @@ while True:
                 for i, player in enumerate(players):
                     if event.key == player.controls["shoot"] and player_timers[i] > 0:
                         player.shoot(traces) # تیراندازی درصورت مثبت بودن تایمر
+                        shoot_sound.play()
 
         keys = pygame.key.get_pressed()
         for player in players:
@@ -574,8 +598,8 @@ while True:
         for target in targets:
             target.draw(screen)
 
-        new_traces = [] # لیست جدید برای تیرهایی که به هدف نخوردند
-        for trace in traces:
+        new_traces = [] # لیست جدید برای تیرهایی که به هدف نخوردند و میخواهیم روی صفحه معلوم باشند
+        for trace in traces: # حلقه برای بررسی برخورد تیر به هدف
             hit_target = None
             for target in targets:
                 if target.is_hit(trace):
@@ -587,12 +611,16 @@ while True:
                     if trace[2] == player.color:
                         if isinstance(hit_target, TimerTarget):
                             hit_target.grant_time(players.index(player))
+                            bonus_sound.play()
                         elif isinstance(hit_target, AmmoTarget):
                             hit_target.grant_ammo(player)
+                            bonus_sound.play()
                         elif isinstance(hit_target, DoublePointsTarget):
                             hit_target.grant_double_points(player)
+                            bonus_sound.play()
                         else:
                             player.update_score(hit_target)
+                            hit_sound.play()
 
                     if isinstance(hit_target, (TimerTarget, AmmoTarget, DoublePointsTarget)):
                         if hit_target in targets:
